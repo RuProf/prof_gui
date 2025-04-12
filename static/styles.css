@@ -263,7 +263,31 @@ tr.highlight-red {
     background-color: #45a049;
 }
 
+/* Drag-and-drop zone */
+.drag-drop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    text-align: center;
+    padding: 20px;
+    margin: 20px;
+}
 
+.drag-drop p {
+    margin: 0;
+    font-size: 1.2em;
+    color: #666;
+}
+
+.drag-drop.dragover {
+    background-color: #e0e0e0;
+    border-color: #666;
+}
 
 @media (max-width: 600px) {
     .container {

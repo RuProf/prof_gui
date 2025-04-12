@@ -37,8 +37,8 @@ docker run --rm -d --name prof_gui \
 - [x] highlight the row into red if pct of time > 30% 
 - [x] gear button for setting
 - check if `/proile.json` exists
-    - [] exists > load existing profile.json like exisiting script 
-    - [] not exists > serverless, drag & drop > save as /profile.json
+    - [x] exists > load existing profile.json like exisiting script 
+    - [x] not exists > serverless, drag & drop > save as /profile.json
 - [] Entrypoint
 - [] gray theme
 - [] netron style

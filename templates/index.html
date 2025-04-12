@@ -27,30 +27,40 @@
         </div>
     </div>
 
-    <div class="container">
-        <div class="tree-panel">
-            <h2>Files</h2>
-            <div id="tree-list"></div>
-        </div>
-        <div class="details-panel">
-            <h2>Line Details</h2>
-            <div id="call-path">Call Path: [Select a function]</div>
-            <div id="function-stats"></div>
-            <table id="lines-table">
-                <thead>
-                    <tr>
-                        <th>Line</th>
-                        <th>Clickable</th>
-                        <th>Count</th>
-                        <th>Time</th>
-                        <th>Pct Time</th>
-                        <th>Code</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+    <!-- Drag-and-drop zone (hidden by default) -->
+    <div id="drag-drop-zone" class="drag-drop" style="display: none;">
+        <p>Drag and drop your profile.json file here, or click to select a file.</p>
+        <input type="file" id="file-input" accept=".json" style="display: none;">
+    </div>
+
+    <!-- Main content (hidden until a file is loaded) -->
+    <div id="main-content" style="display: none;">
+        <div class="container">
+            <div class="tree-panel">
+                <h2>Files</h2>
+                <div id="tree-list"></div>
+            </div>
+            <div class="details-panel">
+                <h2>Line Details</h2>
+                <div id="call-path">Call Path: [Select a function]</div>
+                <div id="function-stats"></div>
+                <table id="lines-table">
+                    <thead>
+                        <tr>
+                            <th>Line</th>
+                            <th>Clickable</th>
+                            <th>Count</th>
+                            <th>Time</th>
+                            <th>Pct Time</th>
+                            <th>Code</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
+
     <script src="/static/script.js"></script>
 </body>
 </html>

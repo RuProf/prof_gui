@@ -5,6 +5,7 @@ let lastFile = null; // Track last file
 let lastFunc = null; // Track last function
 let pctThreshold = 30; // Current threshold for highlighting
 const defaultThreshold = 30; // Default threshold for reset
+let profilingData = null; // Store the loaded profiling data
 
 function updateUI(data, file = selectedFile, func = selectedFunc) {
     const treeList = d3.select("#tree-list");
@@ -35,7 +36,6 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
         });
 
         const funcUl = rootChildren.append("ul");
-        // Sort functions by starting line number
         const sortedFuncs = Object.entries(folderData).sort((a, b) => {
             const aLine = Math.min(...Object.keys(a[1].line).map(Number));
             const bLine = Math.min(...Object.keys(b[1].line).map(Number));
@@ -47,15 +47,13 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
                 .text(funcName)
                 .on("click", (event) => {
                     event.stopPropagation();
-                    d3.json("/data").then(freshData => {
-                        if (selectedFile && selectedFunc && (selectedFile !== folderName || selectedFunc !== funcName)) {
-                            lastFile = selectedFile;
-                            lastFunc = selectedFunc;
-                        }
-                        selectedFile = folderName;
-                        selectedFunc = funcName;
-                        updateUI(freshData, selectedFile, selectedFunc);
-                    });
+                    if (selectedFile && selectedFunc && (selectedFile !== folderName || selectedFunc !== funcName)) {
+                        lastFile = selectedFile;
+                        lastFunc = selectedFunc;
+                    }
+                    selectedFile = folderName;
+                    selectedFunc = funcName;
+                    updateUI(profilingData, selectedFile, selectedFunc);
                 });
             if (folderName === selectedFile && funcName === selectedFunc) {
                 funcLi.classed("active", true);
@@ -63,16 +61,13 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
         });
     });
 
-    // Default to first folder and function if none selected
     if (!selectedFile && Object.keys(data).length > 0) {
         selectedFile = Object.keys(data)[0];
         selectedFunc = Object.keys(data[selectedFile])[0];
     }
 
-    // Update line details if a function is selected
     if (selectedFile && selectedFunc && data[selectedFile] && data[selectedFile][selectedFunc]) {
         const funcData = data[selectedFile][selectedFunc];
-        // Show only Total Time in seconds
         const totalTimeSeconds = (funcData.total_time / 1e9).toFixed(6);
         functionStats.html(`Total Time: ${totalTimeSeconds} s`);
 
@@ -100,21 +95,19 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
             .data(lines)
             .enter()
             .append("tr")
-            .classed("clickable", (d, i) => i === 0 || !!d.calls) // First row or rows with calls
-            .classed("highlight-red", d => d.pct_time && parseFloat(d.pct_time) > pctThreshold) // Highlight if pct_time > threshold
+            .classed("clickable", (d, i) => i === 0 || !!d.calls)
+            .classed("highlight-red", d => d.pct_time && parseFloat(d.pct_time) > pctThreshold)
             .on("click", function(event, d) {
                 const index = linesTable.selectAll("tr").nodes().indexOf(this);
                 if (index === 0) {
-                    // First row: redirect to last file/function if available
                     if (lastFile && lastFunc) {
                         selectedFile = lastFile;
                         selectedFunc = lastFunc;
-                        updateUI(data, selectedFile, selectedFunc);
+                        updateUI(profilingData, selectedFile, selectedFunc);
                     }
                 } else if (d.calls) {
-                    // Other rows: redirect to called function
                     let targetFile = null;
-                    for (const [fileName, fileData] of Object.entries(data)) {
+                    for (const [fileName, fileData] of Object.entries(profilingData)) {
                         if (d.calls in fileData) {
                             targetFile = fileName;
                             break;
@@ -125,7 +118,7 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
                         lastFunc = selectedFunc;
                         selectedFile = targetFile;
                         selectedFunc = d.calls;
-                        updateUI(data, selectedFile, selectedFunc);
+                        updateUI(profilingData, selectedFile, selectedFunc);
                     }
                 }
             });
@@ -139,23 +132,110 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
     }
 }
 
-// Load data and update UI only if changed
-function loadData() {
-    d3.json("/data_timestamp").then(ts => {
-        if (ts.mtime > lastMtime) {
-            d3.json("/data").then(data => {
-                lastMtime = ts.mtime;
-                updateUI(data, selectedFile, selectedFunc);
-            });
-        }
-    });
+function showMainContent() {
+    d3.select("#drag-drop-zone").style("display", "none");
+    d3.select("#main-content").style("display", "block");
 }
 
-// Initial load
-loadData();
+function showDragDropZone() {
+    d3.select("#drag-drop-zone").style("display", "flex");
+    d3.select("#main-content").style("display", "none");
+}
 
-// Poll for updates every 5 seconds
-setInterval(loadData, 5000);
+function loadJSONData(data) {
+    profilingData = data;
+    showMainContent();
+    updateUI(profilingData, selectedFile, selectedFunc);
+}
+
+// Check if /profile.json exists on the server
+fetch("/profile.json", { method: "GET" })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error("profile.json not found");
+        }
+    })
+    .then(data => {
+        loadJSONData(data);
+    })
+    .catch(error => {
+        console.log("Error fetching /profile.json:", error.message);
+        showDragDropZone();
+
+        // Drag-and-drop logic
+        const dragDropZone = d3.select("#drag-drop-zone");
+        const fileInput = d3.select("#file-input");
+
+        // Prevent default behavior for drag events
+        dragDropZone
+            .on("dragover", function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                d3.select(this).classed("dragover", true);
+            })
+            .on("dragenter", function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                d3.select(this).classed("dragover", true);
+            })
+            .on("dragleave", function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                d3.select(this).classed("dragover", false);
+            })
+            .on("drop", function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                d3.select(this).classed("dragover", false);
+
+                const files = event.originalEvent.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.name.endsWith(".json")) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            try {
+                                const data = JSON.parse(e.target.result);
+                                loadJSONData(data);
+                            } catch (err) {
+                                alert("Invalid JSON file: " + err.message);
+                            }
+                        };
+                        reader.readAsText(file);
+                    } else {
+                        alert("Please upload a .json file.");
+                    }
+                }
+            });
+
+        // Allow clicking to upload
+        dragDropZone.on("click", function() {
+            fileInput.node().click();
+        });
+
+        // Handle file input change
+        fileInput.on("change", function() {
+            const file = this.files[0];
+            if (file) {
+                if (file.name.endsWith(".json")) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            loadJSONData(data);
+                        } catch (err) {
+                            alert("Invalid JSON file: " + err.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                } else {
+                    alert("Please upload a .json file.");
+                }
+            }
+        });
+    });
 
 // Settings modal logic
 const modal = d3.select("#settings-modal");
@@ -165,46 +245,114 @@ const saveBtn = d3.select("#save-settings");
 const resetBtn = d3.select("#reset-settings");
 const thresholdInput = d3.select("#pct-threshold");
 
-// Open modal when gear button is clicked
 settingsBtn.on("click", () => {
     modal.style("display", "block");
-    thresholdInput.property("value", pctThreshold); // Set current threshold in input
+    thresholdInput.property("value", pctThreshold);
 });
 
-// Close modal when close button is clicked
 closeBtn.on("click", () => {
     modal.style("display", "none");
 });
 
-// Close modal when clicking outside of it
 window.onclick = function(event) {
     if (event.target === modal.node()) {
         modal.style("display", "none");
     }
 };
 
-// Save settings and update UI
 saveBtn.on("click", () => {
     const newThreshold = parseFloat(thresholdInput.property("value"));
     if (!isNaN(newThreshold) && newThreshold >= 0 && newThreshold <= 100) {
-        pctThreshold = newThreshold; // Update threshold
+        pctThreshold = newThreshold;
         modal.style("display", "none");
-        // Refresh UI with new threshold
-        d3.json("/data").then(data => {
-            updateUI(data, selectedFile, selectedFunc);
-        });
+        if (profilingData) {
+            updateUI(profilingData, selectedFile, selectedFunc);
+        }
     } else {
         alert("Please enter a valid percentage between 0 and 100.");
     }
 });
 
-// Reset settings to default and update UI
 resetBtn.on("click", () => {
-    pctThreshold = defaultThreshold; // Reset to default
-    thresholdInput.property("value", defaultThreshold); // Update input field
+    pctThreshold = defaultThreshold;
+    thresholdInput.property("value", defaultThreshold);
     modal.style("display", "none");
-    // Refresh UI with default threshold
-    d3.json("/data").then(data => {
-        updateUI(data, selectedFile, selectedFunc);
-    });
+    if (profilingData) {
+        updateUI(profilingData, selectedFile, selectedFunc);
+    }
+});
+
+// Drag-and-drop logic
+const dragDropZone = d3.select("#drag-drop-zone");
+const fileInput = d3.select("#file-input");
+
+// Use vanilla JavaScript for drag-and-drop to ensure events fire correctly
+const dragDropElement = dragDropZone.node();
+dragDropElement.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragDropZone.classed("dragover", true);
+});
+
+dragDropElement.addEventListener("dragenter", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragDropZone.classed("dragover", true);
+});
+
+dragDropElement.addEventListener("dragleave", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragDropZone.classed("dragover", false);
+});
+
+dragDropElement.addEventListener("drop", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dragDropZone.classed("dragover", false);
+
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+        const file = files[0];
+        if (file.name.endsWith(".json")) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    loadJSONData(data);
+                } catch (err) {
+                    alert("Invalid JSON file: " + err.message);
+                }
+            };
+            reader.readAsText(file);
+        } else {
+            alert("Please upload a .json file.");
+        }
+    }
+});
+
+// Allow clicking to upload
+dragDropZone.on("click", function() {
+    fileInput.node().click();
+});
+
+// Handle file input change
+fileInput.on("change", function() {
+    const file = this.files[0];
+    if (file) {
+        if (file.name.endsWith(".json")) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    loadJSONData(data);
+                } catch (err) {
+                    alert("Invalid JSON file: " + err.message);
+                }
+            };
+            reader.readAsText(file);
+        } else {
+            alert("Please upload a .json file.");
+        }
+    }
 });

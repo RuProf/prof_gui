@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, send_from_directory
 import json
 
 
@@ -19,6 +19,12 @@ def load_profile_data():
     except (FileNotFoundError, json.JSONDecodeError):
         profile_data_cache = {}
     return profile_data_cache
+
+@app.route('/profile.json')
+def serve_profile_json():
+    if os.path.exists('/profile.json'):
+        return send_from_directory('/', 'profile.json')
+    return '', 404
 
 @app.route("/")
 def index():
