@@ -33,3 +33,12 @@ docker run --rm -d --name prof_gui \
 - Visualize profiling data in a browser with a responsive UI.
 - Efficient Rust-based API server for low-latency data access.
 
+### Next
+- [x] highlight the row into red if pct of time > 30% 
+- [x] gear button for setting
+- check if `/proile.json` exists
+    - [] exists > load existing profile.json like exisiting script 
+    - [] not exists > serverless, drag & drop > save as /profile.json
+- [] Entrypoint
+- [] gray theme
+- [] netron style

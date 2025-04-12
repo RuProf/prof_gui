@@ -3,6 +3,8 @@ let selectedFile = null;
 let selectedFunc = null;
 let lastFile = null; // Track last file
 let lastFunc = null; // Track last function
+let pctThreshold = 30; // Current threshold for highlighting
+const defaultThreshold = 30; // Default threshold for reset
 
 function updateUI(data, file = selectedFile, func = selectedFunc) {
     const treeList = d3.select("#tree-list");
@@ -99,6 +101,7 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
             .enter()
             .append("tr")
             .classed("clickable", (d, i) => i === 0 || !!d.calls) // First row or rows with calls
+            .classed("highlight-red", d => d.pct_time && parseFloat(d.pct_time) > pctThreshold) // Highlight if pct_time > threshold
             .on("click", function(event, d) {
                 const index = linesTable.selectAll("tr").nodes().indexOf(this);
                 if (index === 0) {
@@ -153,3 +156,55 @@ loadData();
 
 // Poll for updates every 5 seconds
 setInterval(loadData, 5000);
+
+// Settings modal logic
+const modal = d3.select("#settings-modal");
+const settingsBtn = d3.select("#settings-btn");
+const closeBtn = d3.select("#close-modal");
+const saveBtn = d3.select("#save-settings");
+const resetBtn = d3.select("#reset-settings");
+const thresholdInput = d3.select("#pct-threshold");
+
+// Open modal when gear button is clicked
+settingsBtn.on("click", () => {
+    modal.style("display", "block");
+    thresholdInput.property("value", pctThreshold); // Set current threshold in input
+});
+
+// Close modal when close button is clicked
+closeBtn.on("click", () => {
+    modal.style("display", "none");
+});
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+    if (event.target === modal.node()) {
+        modal.style("display", "none");
+    }
+};
+
+// Save settings and update UI
+saveBtn.on("click", () => {
+    const newThreshold = parseFloat(thresholdInput.property("value"));
+    if (!isNaN(newThreshold) && newThreshold >= 0 && newThreshold <= 100) {
+        pctThreshold = newThreshold; // Update threshold
+        modal.style("display", "none");
+        // Refresh UI with new threshold
+        d3.json("/data").then(data => {
+            updateUI(data, selectedFile, selectedFunc);
+        });
+    } else {
+        alert("Please enter a valid percentage between 0 and 100.");
+    }
+});
+
+// Reset settings to default and update UI
+resetBtn.on("click", () => {
+    pctThreshold = defaultThreshold; // Reset to default
+    thresholdInput.property("value", defaultThreshold); // Update input field
+    modal.style("display", "none");
+    // Refresh UI with default threshold
+    d3.json("/data").then(data => {
+        updateUI(data, selectedFile, selectedFunc);
+    });
+});
