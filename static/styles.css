@@ -1,0 +1,156 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    display: flex;
+    gap: 20px;
+}
+
+.tree-panel {
+    width: 18%;
+    min-width: 150px;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+}
+
+.details-panel {
+    flex: 1;
+}
+
+h2 {
+    margin-bottom: 10px;
+}
+
+#tree-list {
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 5px;
+}
+
+.directory {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.directory li {
+    padding: 5px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.directory li:hover {
+    background-color: #e0e0e0;
+}
+
+.directory li.active {
+    background-color: #cce5ff;
+}
+
+.directory .collapsible {
+    position: relative;
+    padding-left: 20px;
+}
+
+.directory .collapsible::before {
+    content: "▶";
+    position: absolute;
+    left: 5px;
+    font-size: 10px;
+    transition: transform 0.2s;
+}
+
+.directory .collapsible.expanded::before {
+    transform: rotate(90deg);
+}
+
+.directory .collapsible::after {
+    content: "📁";
+    position: absolute;
+    left: 10px;
+    font-size: 12px;
+}
+
+.directory .file::before {
+    content: "📄";
+    margin-right: 5px;
+    font-size: 12px;
+}
+
+.directory .function::before {
+    content: "ƒ";
+    margin-right: 5px;
+    font-size: 12px;
+}
+
+.directory ul {
+    list-style: none;
+    padding-left: 20px;
+    display: none;
+}
+
+.directory .expanded + ul {
+    display: block;
+}
+
+#call-path {
+    display: none;
+}
+
+#function-stats {
+    margin: 10px 0;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 4px;
+    text-align: left;
+}
+
+th {
+    background-color: #f0f0f0;
+}
+
+td.code {
+    white-space: pre-wrap;
+    font-family: monospace;
+    max-width: 300px;
+    word-wrap: break-word;
+}
+
+tr.clickable:hover {
+    background-color: #e0e0e0;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .tree-panel {
+        width: 100%;
+        min-width: 0;
+        position: static;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 2px;
+    }
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profiling Visualizer</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="tree-panel">
+            <h2>Files</h2>
+            <div id="tree-list"></div>
+        </div>
+        <div class="details-panel">
+            <h2>Line Details</h2>
+            <div id="call-path">Call Path: [Select a function]</div>
+            <div id="function-stats"></div>
+            <table id="lines-table">
+                <thead>
+                    <tr>
+                        <th>Line</th>
+                        <th>Clickable</th>
+                        <th>Count</th>
+                        <th>Time</th>
+                        <th>Pct Time</th>
+                        <th>Code</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
