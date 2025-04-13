@@ -10,6 +10,7 @@ CMD ["python", "app.py"]
 
 # Dev
 # docker run --rm -it -p 5000:8080 prof_gui:python
+# docker run --rm -it -v $PWD:/app -w /app -p 5000:8080 prof_gui:python bash
 
 # Deploy
 # docker run --rm -d --name prof_gui -v ./profile.json:/profile.json -p 5000:8080 prof_gui:python

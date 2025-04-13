@@ -151,21 +151,29 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
                 event.stopPropagation(); // Prevent bubbling to row or table
                 const index = linesTable.selectAll("tr").nodes().indexOf(this.parentNode);
                 if (index === 0) {
-                    // Show callers modal instead of navigating back
+                    // Show callers modal
                     const callersModal = d3.select("#callers-modal");
-                    const callersList = d3.select("#callers-list");
-                    callersList.selectAll("*").remove(); // Clear previous list
+                    const callersTableBody = d3.select("#callers-table tbody");
+                    callersTableBody.selectAll("*").remove(); // Clear previous rows
 
-                    // Find functions that call the selected function
+                    // Find immediate callers of the selected function
                     const callers = [];
+                    const seenCallers = new Set(); // Prevent duplicates
                     for (const [fileName, fileData] of Object.entries(data)) {
                         if (fileName === "entrypoint") continue;
                         for (const [funcName, funcData] of Object.entries(fileData)) {
                             if (funcName === selectedFunc && fileName === selectedFile) continue; // Skip self
-                            for (const [, lineInfo] of Object.entries(funcData.line)) {
+                            for (const [lineNum, lineInfo] of Object.entries(funcData.line)) {
                                 if (lineInfo.code && typeof lineInfo.code === "string" && lineInfo.code.includes(selectedFunc)) {
-                                    callers.push({ file: fileName, func: funcName });
-                                    break;
+                                    const callerKey = `${fileName}::${funcName}`;
+                                    if (!seenCallers.has(callerKey)) {
+                                        seenCallers.add(callerKey);
+                                        callers.push({
+                                            file: fileName,
+                                            func: funcName,
+                                            hits: lineInfo.count || 0 // Use hit count from the calling line
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -180,22 +188,27 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
                         selectedFunc = callers[0].func;
                         updateUI(profilingData, selectedFile, selectedFunc);
                     } else if (callers.length > 1) {
-                        // Show modal for multiple callers
-                        callersList.selectAll("div")
+                        // Populate table in modal
+                        const rows = callersTableBody.selectAll("tr")
                             .data(callers)
                             .enter()
-                            .append("div")
-                            .attr("class", "caller-item")
-                            .text(d => `${d.file.replace('./', '')}::${d.func}()`)
+                            .append("tr")
+                            .attr("class", "caller-row")
                             .on("click", function(event, d) {
                                 event.stopPropagation();
-                                lastFile = selectedFile;
-                                lastFunc = selectedFunc;
+                                history = history.slice(0, historyIndex + 1); // Truncate forward history
+                                history.push({ file: selectedFile, func: selectedFunc });
+                                historyIndex++;
                                 selectedFile = d.file;
                                 selectedFunc = d.func;
                                 updateUI(profilingData, selectedFile, selectedFunc);
                                 callersModal.style("display", "none");
                             });
+
+                        rows.append("td").text(d => d.file.replace('./', ''));
+                        rows.append("td").text(d => `${d.func}()`);
+                        rows.append("td").text(d => d.hits);
+
                         callersModal.style("display", "block");
                     }
 

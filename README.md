@@ -58,7 +58,7 @@ chore
 - [x] add hyper formatting clickable code cell in blue font
 - [x] backbutton for last page
 - [x] trace last page record in list
-
+- [x] modal table view for hierarchy called
 - [] mapping dict for `import as` redirect
 
 

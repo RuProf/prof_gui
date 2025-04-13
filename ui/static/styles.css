@@ -339,7 +339,7 @@ td.clickable-code:hover {
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
-    max-width: 400px;
+    max-width: 600px; /* Increased for table */
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -440,26 +440,53 @@ body.dark-theme .modal-content input {
     background-color: #45a049;
 }
 
-/* Callers modal specific styles */
-.caller-item {
-    padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #ccc;
+/* Callers table specific styles */
+#callers-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
 }
 
-.caller-item:last-child {
-    border-bottom: none;
+#callers-table th,
+#callers-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
 }
 
-.caller-item:hover {
+#callers-table th:nth-child(1), #callers-table td:nth-child(1) { /* File */
+    width: 40%;
+}
+
+#callers-table th:nth-child(2), #callers-table td:nth-child(2) { /* Function */
+    width: 40%;
+}
+
+#callers-table th:nth-child(3), #callers-table td:nth-child(3) { /* Hit Count */
+    width: 20%;
+    text-align: center;
+}
+
+#callers-table th {
     background-color: #f0f0f0;
 }
 
-body.dark-theme .caller-item {
-    border-bottom: 1px solid #555;
+body.dark-theme #callers-table th {
+    background-color: #4a4a4a;
 }
 
-body.dark-theme .caller-item:hover {
+body.dark-theme #callers-table th,
+body.dark-theme #callers-table td {
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+.caller-row:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+body.dark-theme .caller-row:hover {
     background-color: #4a4a4a;
 }
 
@@ -557,6 +584,19 @@ body.dark-theme .drag-drop.dragover {
         width: auto;
     }
 
+    /* Adjust callers table for smaller screens */
+    #callers-table th:nth-child(1), #callers-table td:nth-child(1) { /* File */
+        width: 35%;
+    }
+
+    #callers-table th:nth-child(2), #callers-table td:nth-child(2) { /* Function */
+        width: 35%;
+    }
+
+    #callers-table th:nth-child(3), #callers-table td:nth-child(3) { /* Hit Count */
+        width: 30%;
+    }
+
     .drag-drop {
         width: 90%;
         height: 200px;
@@ -574,5 +614,10 @@ body.dark-theme .drag-drop.dragover {
 
     #function-name {
         font-size: 1.2em; /* Slightly smaller for mobile */
+    }
+
+    .modal-content {
+        width: 90%;
+        max-width: 90%;
     }
 }
