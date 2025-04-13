@@ -32,12 +32,16 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
     const treeList = d3.select("#tree-list");
     const linesTable = d3.select("#lines-table tbody");
     const functionStats = d3.select("#function-stats");
+    const functionNameHeader = d3.select("#function-name"); // Select the new h2 element
 
     // Clear existing content
     treeList.selectAll("*").remove();
     linesTable.selectAll("tr").remove();
     functionStats.text("");
 
+    // Set function name header
+    functionNameHeader.text(func ? `${func}()` : "No Function Selected");
+    
     // Build tree structure
     const treeUl = treeList.append("ul").attr("class", "directory");
     const root = treeUl.append("li").attr("class", "collapsible expanded").text("Files");

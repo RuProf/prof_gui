@@ -2,8 +2,6 @@
 
 **Prof GUI** is a tool for profiling Python scripts and visualizing performance data through a web interface. It combines a Python-based CLI (`lprof_ext`) for generating profiling data with a high-performance Rust (also have a Python-based version) web server (`prof_gui`) for displaying results interactively.
 
-
-
 ## Quick Start
 
 ### Profiling
@@ -34,6 +32,11 @@ docker run --rm -d --name prof_gui \
 - Profile Python scripts with minimal setup using `lprof_ext`.
 - Visualize profiling data in a browser with a responsive UI.
 - Efficient Rust-based API server for low-latency data access.
+- Support Dark mode
+
+1. 快速理解一個repo 的trigger flow 
+2. 了解一個repo 的processing speed
+3. 
 
 ### Next
 - [x] highlight the row into red if pct of time > 30% 
@@ -45,3 +48,17 @@ docker run --rm -d --name prof_gui \
 - [x] gray theme (dark mode)
 - [] netron style
 - [] mouse -> previous page button = go to lastFile + lastFunc
+
+chore 
+- [x] remove line details , 換做func name
+- [] highlight the cell of pct time instead of row 
+- [] highlight the code cell in grey if clickable 
+- [] remove col2 clickable
+// - [] add hand pointer mouseover clickable row
+- [] mapping dict for `import as` redirect
+- [] last page i feel like button outside of the table btw 
+
+
+
+lprof 
+inline callable , like print_stats()
