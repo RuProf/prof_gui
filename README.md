@@ -21,7 +21,7 @@ lprof_ext entrypoint.py
 docker run --rm -d --name prof_gui \
            -v ./profile.json:/profile.json \
            -p 8080:8080 \
-           ruprof/prof_gui:rs
+           ruprof/prof_gui:rust
 
 # Python Backend
 docker run --rm -d --name prof_gui \
