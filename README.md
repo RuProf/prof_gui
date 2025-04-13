@@ -9,6 +9,8 @@
 ### Profiling
 ```bash
 lprof_ext entrypoint.py
+# Tips: GUI will trace entrypoint.main() by default.
+# It still work even if you don't have main().
 ```
 - **Python Component**: The `lprof_ext` CLI instruments Python scripts with `@profile` decorators to collect performance metrics using the `line_profiler` library, and saving results to `profile.json`.
 
@@ -39,6 +41,7 @@ docker run --rm -d --name prof_gui \
 - check if `/proile.json` exists
     - [x] exists > load existing profile.json like exisiting script 
     - [x] not exists > serverless, drag & drop > save as /profile.json
-- [] Entrypoint
-- [] gray theme
+- [x] Entrypoint
+- [x] gray theme (dark mode)
 - [] netron style
+- [] mouse -> previous page button = go to lastFile + lastFunc

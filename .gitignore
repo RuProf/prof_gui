@@ -1,0 +1,2 @@
+backend/rust/target/
+*.json

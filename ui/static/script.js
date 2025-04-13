@@ -3,9 +3,30 @@ let selectedFile = null;
 let selectedFunc = null;
 let lastFile = null; // Track last file
 let lastFunc = null; // Track last function
-let pctThreshold = 30; // Current threshold for highlighting
-const defaultThreshold = 30; // Default threshold for reset
+let pctThreshold = 15; // Current threshold for highlighting
+const defaultThreshold = 15; // Default threshold for reset
 let profilingData = null; // Store the loaded profiling data
+
+// Theme toggle logic
+const themeToggleBtn = d3.select("#theme-toggle-btn");
+const body = d3.select("body");
+
+// Load saved theme preference from localStorage
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme === "dark") {
+    body.classed("dark-theme", true);
+    themeToggleBtn.text("☀️"); // Sun icon for light mode toggle
+} else {
+    themeToggleBtn.text("🌙"); // Moon icon for dark mode toggle
+}
+
+// Toggle theme on button click
+themeToggleBtn.on("click", () => {
+    const isDark = body.classed("dark-theme");
+    body.classed("dark-theme", !isDark);
+    themeToggleBtn.text(isDark ? "🌙" : "☀️"); // Toggle icon
+    localStorage.setItem("theme", isDark ? "light" : "dark"); // Save preference
+});
 
 function updateUI(data, file = selectedFile, func = selectedFunc) {
     const treeList = d3.select("#tree-list");
@@ -25,8 +46,19 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
     });
     const rootChildren = treeUl.append("ul");
 
-    // Treat top-level keys as directories
-    Object.entries(data).forEach(([folderName, folderData]) => {
+    // Sort files to prioritize the entrypoint at the top
+    const files = Object.entries(data).filter(([folderName]) => folderName !== "entrypoint");
+    files.sort(([aFolderName], [bFolderName]) => {
+        const entrypoint = data.entrypoint;
+        if (entrypoint) {
+            if (aFolderName === entrypoint) return -1; // entrypoint comes first
+            if (bFolderName === entrypoint) return 1;  // entrypoint comes first
+        }
+        return aFolderName.localeCompare(bFolderName); // Sort remaining files alphabetically
+    });
+
+    // Treat top-level keys as directories (excluding "entrypoint")
+    files.forEach(([folderName, folderData]) => {
         const folderLi = rootChildren.append("li")
             .attr("class", "collapsible expanded")
             .text(folderName);
@@ -61,11 +93,7 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
         });
     });
 
-    if (!selectedFile && Object.keys(data).length > 0) {
-        selectedFile = Object.keys(data)[0];
-        selectedFunc = Object.keys(data[selectedFile])[0];
-    }
-
+    // Update line details if a function is selected
     if (selectedFile && selectedFunc && data[selectedFile] && data[selectedFile][selectedFunc]) {
         const funcData = data[selectedFile][selectedFunc];
         const totalTimeSeconds = (funcData.total_time / 1e9).toFixed(6);
@@ -73,6 +101,7 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
 
         const allFunctions = new Set();
         Object.values(data).forEach(fileData => {
+            if (fileData === data.entrypoint) return; // Skip entrypoint
             Object.keys(fileData).forEach(funcName => allFunctions.add(funcName));
         });
 
@@ -108,6 +137,7 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
                 } else if (d.calls) {
                     let targetFile = null;
                     for (const [fileName, fileData] of Object.entries(profilingData)) {
+                        if (fileName === "entrypoint") continue;
                         if (d.calls in fileData) {
                             targetFile = fileName;
                             break;
@@ -144,6 +174,29 @@ function showDragDropZone() {
 
 function loadJSONData(data) {
     profilingData = data;
+
+    // Set the default selected file based on the entrypoint
+    if (data.entrypoint && typeof data.entrypoint === "string" && data[data.entrypoint]) {
+        selectedFile = data.entrypoint;
+        const functions = Object.keys(data[selectedFile]);
+        if (functions.includes("main")) {
+            selectedFunc = "main"; // Prioritize main() if it exists
+        } else {
+            selectedFunc = functions.length > 0 ? functions[0] : null;
+        }
+    } else {
+        const files = Object.keys(data).filter(key => key !== "entrypoint");
+        selectedFile = files.length > 0 ? files[0] : null;
+        if (selectedFile) {
+            const functions = Object.keys(data[selectedFile]);
+            if (functions.includes("main")) {
+                selectedFunc = "main"; // Prioritize main() if it exists
+            } else {
+                selectedFunc = functions.length > 0 ? functions[0] : null;
+            }
+        }
+    }
+
     showMainContent();
     updateUI(profilingData, selectedFile, selectedFunc);
 }

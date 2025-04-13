@@ -2,6 +2,55 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
+    background-color: #ffffff; /* Default light background */
+    color: #333; /* Default text color */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme change */
+}
+
+body.dark-theme {
+    background-color: #2d2d2d; /* Dark gray background */
+    color: #e0e0e0; /* Light gray text */
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    position: fixed;
+    top: 10px;
+    right: 50px; /* Position to the left of the settings button */
+    z-index: 1000;
+}
+
+#theme-toggle-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+#theme-toggle-btn:hover {
+    transform: scale(1.2); /* Slight scale effect on hover */
+}
+
+/* Settings button (adjust position if needed) */
+.settings-button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+}
+
+#settings-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: transform 0.2s;
+}
+
+#settings-btn:hover {
+    transform: rotate(90deg);
 }
 
 .container {
@@ -15,21 +64,20 @@ body {
     position: sticky;
     top: 20px;
     align-self: flex-start;
-}
-
-.details-panel {
-    flex: 1;
-}
-
-h2 {
-    margin-bottom: 10px;
+    height: calc(100vh - 40px);
 }
 
 #tree-list {
-    height: 400px;
+    max-height: calc(100% - 40px);
     overflow-y: auto;
     border: 1px solid #ccc;
     padding: 5px;
+    background-color: #f9f9f9; /* Default light background */
+}
+
+body.dark-theme #tree-list {
+    background-color: #3a3a3a; /* Darker gray for tree list */
+    border-color: #555;
 }
 
 .directory {
@@ -48,8 +96,16 @@ h2 {
     background-color: #e0e0e0;
 }
 
+body.dark-theme .directory li:hover {
+    background-color: #4a4a4a; /* Darker hover background */
+}
+
 .directory li.active {
     background-color: #cce5ff;
+}
+
+body.dark-theme .directory li.active {
+    background-color: #5555ff; /* Darker active background */
 }
 
 .directory .collapsible {
@@ -98,6 +154,19 @@ h2 {
     display: block;
 }
 
+.details-panel {
+    flex: 1;
+}
+
+h2 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+body.dark-theme h2 {
+    color: #e0e0e0; /* Light text for headers in dark mode */
+}
+
 #call-path {
     display: none;
 }
@@ -119,8 +188,18 @@ th, td {
     text-align: left;
 }
 
+body.dark-theme th,
+body.dark-theme td {
+    border-color: #555;
+    color: #e0e0e0;
+}
+
 th {
     background-color: #f0f0f0;
+}
+
+body.dark-theme th {
+    background-color: #4a4a4a; /* Darker header background */
 }
 
 td.code {
@@ -132,32 +211,18 @@ td.code {
 
 tr.clickable:hover {
     background-color: #e0e0e0;
-    cursor: pointer;
+}
+
+body.dark-theme tr.clickable:hover {
+    background-color: #4a4a4a;
 }
 
 tr.highlight-red {
     background-color: #ffcccc; /* Light red background */
 }
 
-/* Gear button in top-right corner */
-.settings-button {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    z-index: 1000;
-}
-
-#settings-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 5px 10px;
-    transition: transform 0.2s;
-}
-
-#settings-btn:hover {
-    transform: rotate(90deg);
+body.dark-theme tr.highlight-red {
+    background-color: #662222; /* Darker red for highlighted rows */
 }
 
 /* Modal styling */
@@ -183,6 +248,12 @@ tr.highlight-red {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+body.dark-theme .modal-content {
+    background-color: #3a3a3a;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
 .close {
     color: #aaa;
     float: right;
@@ -191,19 +262,36 @@ tr.highlight-red {
     cursor: pointer;
 }
 
+body.dark-theme .close {
+    color: #ccc;
+}
+
 .close:hover,
 .close:focus {
     color: black;
     text-decoration: none;
 }
 
+body.dark-theme .close:hover,
+body.dark-theme .close:focus {
+    color: white;
+}
+
 .modal-content h3 {
     margin-top: 0;
+}
+
+body.dark-theme .modal-content h3 {
+    color: #e0e0e0;
 }
 
 .modal-content label {
     display: block;
     margin: 10px 0 5px;
+}
+
+body.dark-theme .modal-content label {
+    color: #e0e0e0;
 }
 
 .modal-content input {
@@ -214,17 +302,10 @@ tr.highlight-red {
     border-radius: 3px;
 }
 
-.modal-content button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-.modal-content button:hover {
-    background-color: #45a049;
+body.dark-theme .modal-content input {
+    background-color: #4a4a4a;
+    border-color: #555;
+    color: #e0e0e0;
 }
 
 /* Modal button container */
@@ -237,7 +318,7 @@ tr.highlight-red {
 
 /* Reset button */
 #reset-settings {
-    background-color: #f44336; /* Red for reset */
+    background-color: #f44336;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -249,7 +330,7 @@ tr.highlight-red {
     background-color: #d32f2f;
 }
 
-/* Save button (already exists, just ensuring consistency) */
+/* Save button */
 #save-settings {
     background-color: #4CAF50;
     color: white;
@@ -269,13 +350,23 @@ tr.highlight-red {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: 300px;
+    width: 500px;
     border: 2px dashed #ccc;
     border-radius: 5px;
     background-color: #f9f9f9;
     text-align: center;
     padding: 20px;
-    margin: 20px;
+    margin: 0 auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+body.dark-theme .drag-drop {
+    background-color: #3a3a3a;
+    border-color: #555;
 }
 
 .drag-drop p {
@@ -284,9 +375,18 @@ tr.highlight-red {
     color: #666;
 }
 
+body.dark-theme .drag-drop p {
+    color: #ccc;
+}
+
 .drag-drop.dragover {
     background-color: #e0e0e0;
     border-color: #666;
+}
+
+body.dark-theme .drag-drop.dragover {
+    background-color: #4a4a4a;
+    border-color: #888;
 }
 
 @media (max-width: 600px) {
@@ -298,6 +398,11 @@ tr.highlight-red {
         width: 100%;
         min-width: 0;
         position: static;
+        height: auto;
+    }
+
+    #tree-list {
+        max-height: 300px;
     }
 
     table {
@@ -306,5 +411,10 @@ tr.highlight-red {
 
     th, td {
         padding: 2px;
+    }
+
+    .drag-drop {
+        width: 90%;
+        height: 200px;
     }
 }
