@@ -51,12 +51,15 @@ docker run --rm -d --name prof_gui \
 
 chore 
 - [x] remove line details , 換做func name
-- [] highlight the cell of pct time instead of row 
-- [] highlight the code cell in grey if clickable 
-- [] remove col2 clickable
-// - [] add hand pointer mouseover clickable row
+- [x] highlight the cell of pct time instead of row 
+- [x] highlight the code cell in grey if clickable 
+- [x] remove col2 clickable
+- [x] add hand pointer mouseover clickable code cell
+- [x] add hyper formatting clickable code cell in blue font
+- [x] backbutton for last page
+- [x] trace last page record in list
+
 - [] mapping dict for `import as` redirect
-- [] last page i feel like button outside of the table btw 
 
 
 

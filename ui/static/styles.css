@@ -32,7 +32,7 @@ body.dark-theme {
     transform: scale(1.2); /* Slight scale effect on hover */
 }
 
-/* Settings button (adjust position if needed) */
+/* Settings button */
 .settings-button {
     position: fixed;
     top: 10px;
@@ -53,11 +53,59 @@ body.dark-theme {
     transform: rotate(90deg);
 }
 
+.header-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Go back button */
+/* From Uiverse.io by Jedi-hongbin */
+#go-back-btn {
+    display: flex;
+    height: 3em;
+    width: 100px;
+    align-items: center;
+    justify-content: center;
+    background-color: #eeeeee4b;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    transition: all 0.2s linear;
+    cursor: pointer;
+    border: none;
+    background: #fff;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+    
+#go-back-btn > svg {
+    margin-right: 5px;
+    margin-left: 5px;
+    font-size: 20px;
+    transition: all 0.4s ease-in;
+}
+
+#go-back-btn:hover > svg {
+    font-size: 1.2em;
+    transform: translateX(-5px);
+}
+    
+#go-back-btn:hover {
+    box-shadow: 9px 9px 33px #d1d1d1, -9px -9px 33px #ffffff;
+    transform: translateY(-2px);
+}
+
 .container {
     display: flex;
     gap: 20px;
 }
 
+body.dark-theme #go-back-btn {
+    background: #3a3a3a;
+    color: #e0e0e0;
+}
+    
 .tree-panel {
     width: 18%;
     min-width: 150px;
@@ -167,6 +215,12 @@ body.dark-theme h2 {
     color: #e0e0e0; /* Light text for headers in dark mode */
 }
 
+#function-name {
+    display: inline-block; /* Align with go-back button */
+    vertical-align: middle;
+    margin: 0; /* Reset margin for inline alignment */
+}
+
 #call-path {
     display: none;
 }
@@ -180,12 +234,49 @@ body.dark-theme h2 {
 table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed; /* Enforce fixed column widths */
 }
 
 th, td {
     border: 1px solid #ccc;
     padding: 4px;
     text-align: left;
+    overflow: hidden; /* Prevent content from stretching columns */
+    text-overflow: ellipsis; /* Add ellipsis for overflow text */
+}
+
+/* Fixed widths for columns 1–5 */
+th:nth-child(1), td:nth-child(1) { /* Line */
+    width: 70px;
+}
+
+th:nth-child(2), td:nth-child(2) { /* Count */
+    width: 90px;
+}
+
+th:nth-child(3), td:nth-child(3) { /* Time */
+    width: 110px;
+}
+
+th:nth-child(4), td:nth-child(4) { /* Time Per Hit */
+    width: 110px;
+}
+
+th:nth-child(5), td:nth-child(5) { /* % Time */
+    width: 110px;
+}
+
+th:nth-child(6), td:nth-child(6) { /* Code */
+    width: auto; /* Take remaining space */
+}
+
+/* Center text for columns 1–5 (Line, Count, Time, Time Per Hit, % Time) */
+th:nth-child(1), td:nth-child(1), /* Line */
+th:nth-child(2), td:nth-child(2), /* Count */
+th:nth-child(3), td:nth-child(3), /* Time */
+th:nth-child(4), td:nth-child(4), /* Time Per Hit */
+th:nth-child(5), td:nth-child(5) { /* % Time */
+    text-align: center;
 }
 
 body.dark-theme th,
@@ -205,24 +296,29 @@ body.dark-theme th {
 td.code {
     white-space: pre-wrap;
     font-family: monospace;
-    max-width: 300px;
     word-wrap: break-word;
 }
 
-tr.clickable:hover {
-    background-color: #e0e0e0;
+td.highlight-red {
+    background-color: #ffcccc; /* Light red for cells */
 }
 
-body.dark-theme tr.clickable:hover {
-    background-color: #4a4a4a;
+body.dark-theme td.highlight-red {
+    background-color: #662222; /* Darker red for cells */
 }
 
-tr.highlight-red {
-    background-color: #ffcccc; /* Light red background */
+td.clickable-code {
+    background-color: #e0e0e0; /* Light grey for clickable code cells */
+    color: #0000FF; /* Blue font for hyperlink style */
 }
 
-body.dark-theme tr.highlight-red {
-    background-color: #662222; /* Darker red for highlighted rows */
+body.dark-theme td.clickable-code {
+    background-color: #4a4a4a; /* Darker grey for dark mode */
+    color: #ADD8E6; /* Light blue for dark mode */
+}
+
+td.clickable-code:hover {
+    cursor: pointer;
 }
 
 /* Modal styling */
@@ -344,6 +440,29 @@ body.dark-theme .modal-content input {
     background-color: #45a049;
 }
 
+/* Callers modal specific styles */
+.caller-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #ccc;
+}
+
+.caller-item:last-child {
+    border-bottom: none;
+}
+
+.caller-item:hover {
+    background-color: #f0f0f0;
+}
+
+body.dark-theme .caller-item {
+    border-bottom: 1px solid #555;
+}
+
+body.dark-theme .caller-item:hover {
+    background-color: #4a4a4a;
+}
+
 /* Drag-and-drop zone */
 .drag-drop {
     display: flex;
@@ -413,8 +532,47 @@ body.dark-theme .drag-drop.dragover {
         padding: 2px;
     }
 
+    /* Adjust column widths for smaller screens */
+    th:nth-child(1), td:nth-child(1) { /* Line */
+        width: 50px;
+    }
+
+    th:nth-child(2), td:nth-child(2) { /* Count */
+        width: 60px;
+    }
+
+    th:nth-child(3), td:nth-child(3) { /* Time */
+        width: 80px;
+    }
+
+    th:nth-child(4), td:nth-child(4) { /* Time Per Hit */
+        width: 80px;
+    }
+
+    th:nth-child(5), td:nth-child(5) { /* % Time */
+        width: 60px;
+    }
+
+    th:nth-child(6), td:nth-child(6) { /* Code */
+        width: auto;
+    }
+
     .drag-drop {
         width: 90%;
         height: 200px;
+    }
+
+    #go-back-btn {
+        height: 2.5em;
+        width: 80px;
+    }
+
+    #go-back-btn {
+        height: 20px; /* Smaller for mobile */
+        margin-right: 8px;
+    }
+
+    #function-name {
+        font-size: 1.2em; /* Slightly smaller for mobile */
     }
 }

@@ -1,8 +1,8 @@
 let lastMtime = 0;
 let selectedFile = null;
 let selectedFunc = null;
-let lastFile = null; // Track last file
-let lastFunc = null; // Track last function
+let history = []; // Track navigation history as list of {file, func}
+let historyIndex = -1; // Current position in history
 let pctThreshold = 15; // Current threshold for highlighting
 const defaultThreshold = 15; // Default threshold for reset
 let profilingData = null; // Store the loaded profiling data
@@ -32,16 +32,17 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
     const treeList = d3.select("#tree-list");
     const linesTable = d3.select("#lines-table tbody");
     const functionStats = d3.select("#function-stats");
-    const functionNameHeader = d3.select("#function-name"); // Select the new h2 element
+    const functionNameHeader = d3.select("#function-name"); // Select the function name header
+    const goBackBtn = d3.select("#go-back-btn"); // Select the go back button
 
     // Clear existing content
     treeList.selectAll("*").remove();
     linesTable.selectAll("tr").remove();
     functionStats.text("");
 
-    // Set function name header
-    functionNameHeader.text(func ? `${func}()` : "No Function Selected");
-    
+    // Set function name header with parentheses
+    functionNameHeader.text(func ? `${file.replace('./', '')}::${func}()` : "No Function Selected");
+
     // Build tree structure
     const treeUl = treeList.append("ul").attr("class", "directory");
     const root = treeUl.append("li").attr("class", "collapsible expanded").text("Files");
@@ -84,8 +85,9 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
                 .on("click", (event) => {
                     event.stopPropagation();
                     if (selectedFile && selectedFunc && (selectedFile !== folderName || selectedFunc !== funcName)) {
-                        lastFile = selectedFile;
-                        lastFunc = selectedFunc;
+                        history = history.slice(0, historyIndex + 1); // Truncate forward history
+                        history.push({ file: selectedFile, func: selectedFunc });
+                        historyIndex++;
                     }
                     selectedFile = folderName;
                     selectedFunc = funcName;
@@ -120,24 +122,83 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
                         }
                     }
                 }
-                return { line: lineNum, ...info, calls };
+                // Calculate time per hit (time / count in seconds)
+                let time_per_hit = "-";
+                if (info.time && info.count && info.count > 0) {
+                    time_per_hit = (info.time / info.count / 1e9).toFixed(6) + " s";
+                }
+                return { line: lineNum, ...info, calls, time_per_hit };
             })
             .sort((a, b) => +a.line - +b.line);
 
         const rows = linesTable.selectAll("tr")
             .data(lines)
             .enter()
-            .append("tr")
-            .classed("clickable", (d, i) => i === 0 || !!d.calls)
-            .classed("highlight-red", d => d.pct_time && parseFloat(d.pct_time) > pctThreshold)
+            .append("tr");
+
+        rows.append("td").text(d => d.line);
+        rows.append("td").text(d => d.count || "-");
+        rows.append("td").text(d => d.time ? (d.time / 1e9).toFixed(6) + " s" : "-");
+        rows.append("td").text(d => d.time_per_hit);
+        rows.append("td")
+            .text(d => d.pct_time !== "" ? d.pct_time + "%" : "-")
+            .classed("highlight-red", d => d.pct_time && parseFloat(d.pct_time) > pctThreshold);
+        rows.append("td")
+            .attr("class", "code")
+            .text(d => d.code || "-")
+            .classed("clickable-code", (d, i) => i === 0 || !!d.calls)
             .on("click", function(event, d) {
-                const index = linesTable.selectAll("tr").nodes().indexOf(this);
+                event.stopPropagation(); // Prevent bubbling to row or table
+                const index = linesTable.selectAll("tr").nodes().indexOf(this.parentNode);
                 if (index === 0) {
-                    if (lastFile && lastFunc) {
-                        selectedFile = lastFile;
-                        selectedFunc = lastFunc;
-                        updateUI(profilingData, selectedFile, selectedFunc);
+                    // Show callers modal instead of navigating back
+                    const callersModal = d3.select("#callers-modal");
+                    const callersList = d3.select("#callers-list");
+                    callersList.selectAll("*").remove(); // Clear previous list
+
+                    // Find functions that call the selected function
+                    const callers = [];
+                    for (const [fileName, fileData] of Object.entries(data)) {
+                        if (fileName === "entrypoint") continue;
+                        for (const [funcName, funcData] of Object.entries(fileData)) {
+                            if (funcName === selectedFunc && fileName === selectedFile) continue; // Skip self
+                            for (const [, lineInfo] of Object.entries(funcData.line)) {
+                                if (lineInfo.code && typeof lineInfo.code === "string" && lineInfo.code.includes(selectedFunc)) {
+                                    callers.push({ file: fileName, func: funcName });
+                                    break;
+                                }
+                            }
+                        }
                     }
+
+                    if (callers.length === 1) {
+                        // Directly navigate to the single caller
+                        history = history.slice(0, historyIndex + 1); // Truncate forward history
+                        history.push({ file: selectedFile, func: selectedFunc });
+                        historyIndex++;
+                        selectedFile = callers[0].file;
+                        selectedFunc = callers[0].func;
+                        updateUI(profilingData, selectedFile, selectedFunc);
+                    } else if (callers.length > 1) {
+                        // Show modal for multiple callers
+                        callersList.selectAll("div")
+                            .data(callers)
+                            .enter()
+                            .append("div")
+                            .attr("class", "caller-item")
+                            .text(d => `${d.file.replace('./', '')}::${d.func}()`)
+                            .on("click", function(event, d) {
+                                event.stopPropagation();
+                                lastFile = selectedFile;
+                                lastFunc = selectedFunc;
+                                selectedFile = d.file;
+                                selectedFunc = d.func;
+                                updateUI(profilingData, selectedFile, selectedFunc);
+                                callersModal.style("display", "none");
+                            });
+                        callersModal.style("display", "block");
+                    }
+
                 } else if (d.calls) {
                     let targetFile = null;
                     for (const [fileName, fileData] of Object.entries(profilingData)) {
@@ -148,22 +209,27 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
                         }
                     }
                     if (targetFile) {
-                        lastFile = selectedFile;
-                        lastFunc = selectedFunc;
+                        history = history.slice(0, historyIndex + 1); // Truncate forward history
+                        history.push({ file: selectedFile, func: selectedFunc });
+                        historyIndex++;
                         selectedFile = targetFile;
                         selectedFunc = d.calls;
                         updateUI(profilingData, selectedFile, selectedFunc);
                     }
                 }
             });
-
-        rows.append("td").text(d => d.line);
-        rows.append("td").text((d, i) => i === 0 ? "👈" : (d.calls ? "✔️" : "-"));
-        rows.append("td").text(d => d.count || "-");
-        rows.append("td").text(d => d.time ? (d.time / 1e9).toFixed(6) + " s" : "-");
-        rows.append("td").text(d => d.pct_time !== "" ? d.pct_time + "%" : "-");
-        rows.append("td").attr("class", "code").text(d => d.code || "-");
     }
+
+    // Go back button click handler
+    goBackBtn.on("click", () => {
+        if (historyIndex > 0) {
+            historyIndex--;
+            const prev = history[historyIndex];
+            selectedFile = prev.file;
+            selectedFunc = prev.func;
+            updateUI(profilingData, selectedFile, selectedFunc);
+        }
+    });
 }
 
 function showMainContent() {
@@ -188,6 +254,9 @@ function loadJSONData(data) {
         } else {
             selectedFunc = functions.length > 0 ? functions[0] : null;
         }
+        // Initialize history with the first selection
+        history = [{ file: selectedFile, func: selectedFunc }];
+        historyIndex = 0;
     } else {
         const files = Object.keys(data).filter(key => key !== "entrypoint");
         selectedFile = files.length > 0 ? files[0] : null;
@@ -198,6 +267,9 @@ function loadJSONData(data) {
             } else {
                 selectedFunc = functions.length > 0 ? functions[0] : null;
             }
+            // Initialize history with the first selection
+            history = [{ file: selectedFile, func: selectedFunc }];
+            historyIndex = 0;
         }
     }
 
@@ -315,6 +387,9 @@ window.onclick = function(event) {
     if (event.target === modal.node()) {
         modal.style("display", "none");
     }
+    if (event.target === d3.select("#callers-modal").node()) {
+        d3.select("#callers-modal").style("display", "none");
+    }
 };
 
 saveBtn.on("click", () => {
@@ -337,6 +412,14 @@ resetBtn.on("click", () => {
     if (profilingData) {
         updateUI(profilingData, selectedFile, selectedFunc);
     }
+});
+
+// Callers modal logic
+const callersModal = d3.select("#callers-modal");
+const closeCallersBtn = d3.select("#close-callers-modal");
+
+closeCallersBtn.on("click", () => {
+    callersModal.style("display", "none");
 });
 
 // Drag-and-drop logic
@@ -413,3 +496,35 @@ fileInput.on("change", function() {
         }
     }
 });
+
+var whichButton = function (e) {
+    // Handle different event models
+    var e = e || window.event;
+    var btnCode;
+
+    if ('object' === typeof e) {
+        btnCode = e.button;
+
+        switch (btnCode) {
+            case 0:
+                console.log('0');
+            break;
+            case 1:
+                console.log('1');
+            break;
+            case 2:
+                console.log('2');
+            break;
+            case 3:
+                console.log('Browser Back button clicked.');
+            break;
+
+            case 4:
+                console.log('Browser Forward button clicked.');
+            break;
+
+            default:
+                console.log('Unexpected code: ' + btnCode);
+        }
+    }
+};
