@@ -25,5 +25,5 @@ CMD ["/server"]
 # docker run --rm -d -p 5000:8080 prof_gui:rust
 
 # Deploy
-# docker run --rm -d --name prof_gui -v ./profile.json:/profile.json -p 5000:8080 prof_gui:rust
-# docker run --rm -d --name prof_gui -v ./profile.json:/profile.json -p 5000:8080 ruprof/prof_gui:rust
+# docker run --rm -d --name prof_gui -v ./lprof_ext.json:/lprof_ext.json -p 5000:8080 prof_gui:rust
+# docker run --rm -d --name prof_gui -v ./lprof_ext.json:/lprof_ext.json -p 5000:8080 ruprof/prof_gui:rust

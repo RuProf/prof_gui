@@ -62,14 +62,14 @@ async fn get_data_timestamp(State(state): State<AppState>) -> impl IntoResponse 
 }
 
 async fn serve_profile_json() -> impl IntoResponse {
-    debug!("Handling /profile.json request");
-    let path = "/profile.json";
+    debug!("Handling /lprof_ext.json request");
+    let path = "/lprof_ext.json";
     match File::open(path) {
         Ok(mut file) => {
             let mut contents = String::new();
             match file.read_to_string(&mut contents) {
                 Ok(_) => {
-                    debug!("Successfully read /profile.json");
+                    debug!("Successfully read /lprof_ext.json");
                     (
                         StatusCode::OK,
                         [("Content-Type", "application/json")],
@@ -77,20 +77,20 @@ async fn serve_profile_json() -> impl IntoResponse {
                     ).into_response()
                 }
                 Err(e) => {
-                    warn!("Failed to read /profile.json: {}", e);
+                    warn!("Failed to read /lprof_ext.json: {}", e);
                     (StatusCode::INTERNAL_SERVER_ERROR, "Error reading file").into_response()
                 }
             }
         }
         Err(e) => {
-            warn!("Failed to open /profile.json: {}", e);
+            warn!("Failed to open /lprof_ext.json: {}", e);
             (StatusCode::NOT_FOUND, "").into_response() // Match Flask's behavior: return 404 if file not found
         }
     }
 }
 
 async fn load_profile_data(state: &AppState) -> Option<Value> {
-    let path = "/profile.json";                                                 // edit
+    let path = "/lprof_ext.json";                                                 // edit
     debug!("Checking profile data at {}", path);
     let mut profile_data = state.profile_data.lock().unwrap();
     let mut last_mtime = state.last_mtime.lock().unwrap();
@@ -154,7 +154,7 @@ async fn main() {
         .route("/", get(index))
         .route("/data", get(get_data))
         .route("/data_timestamp", get(get_data_timestamp))
-        .route("/profile.json", get(serve_profile_json))
+        .route("/lprof_ext.json", get(serve_profile_json))
         .nest_service("/static", ServeDir::new("/app/static")) // Serve static files   // edit
         .with_state(state);
 

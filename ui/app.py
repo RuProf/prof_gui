@@ -45,3 +45,5 @@ if __name__ == "__main__":
 # docker run --rm -it -v $PWD:/w -w /w -p 10203:5000 python:3.8-slim bash
 # pip3 install flask
 # python3 app.py
+
+# docker run --rm -it --name prof_gui -v $PWD:/w -w /w -v ./lprof_ext.json:/lprof_ext.json -p 5000:8080 ruprof/prof_gui:python

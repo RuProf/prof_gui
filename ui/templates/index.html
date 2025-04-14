@@ -24,7 +24,7 @@
             <span id="close-modal" class="close">×</span>
             <h3>Settings</h3>
             <label for="pct-threshold">Highlight Threshold (%):</label>
-            <input type="number" id="pct-threshold" min="0" max="100" step="1">
+            <input type="number" id="pct-threshold" min="0" max="100" step="1" class="pct-threshold-input">
             <div class="modal-buttons">
                 <button id="reset-settings">Reset</button>
                 <button id="save-settings">Save</button>
@@ -40,9 +40,9 @@
             <table id="callers-table">
                 <thead>
                     <tr>
-                        <th>File</th>
-                        <th>Function</th>
-                        <th>Hit Count</th>
+                        <th>Calls</th>
+                        <th>Func</th>
+                        <th>Path</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -52,7 +52,7 @@
 
     <!-- Drag-and-drop zone -->
     <div id="drag-drop-zone" class="drag-drop">
-        <p>Drag and drop your profile.json file here, or click to select a file.</p>
+        <p>Drag and drop your lprof_ext.json file here, or click to select a file.</p>
         <input type="file" id="file-input" style="display: none;" accept=".json">
     </div>
 

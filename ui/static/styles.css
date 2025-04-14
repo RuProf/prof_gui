@@ -406,10 +406,17 @@ body.dark-theme .modal-content input {
 
 /* Modal button container */
 .modal-buttons {
+    box-sizing: border-box;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 10px;
     margin-top: 20px;
+    width: 100%;
+}
+
+.modal-buttons > #reset-settings {
+    order: -1;
+    margin-right: auto;
 }
 
 /* Reset button */
@@ -444,6 +451,7 @@ body.dark-theme .modal-content input {
 #callers-table {
     width: 100%;
     border-collapse: collapse;
+    text-align: left;
     margin-top: 10px;
 }
 
@@ -454,17 +462,16 @@ body.dark-theme .modal-content input {
     text-align: left;
 }
 
-#callers-table th:nth-child(1), #callers-table td:nth-child(1) { /* File */
-    width: 40%;
+#callers-table th:nth-child(1), #callers-table td:nth-child(1) { /* Hit Count */
+    width: 15%;
 }
 
 #callers-table th:nth-child(2), #callers-table td:nth-child(2) { /* Function */
-    width: 40%;
+    width: 30%;
 }
 
-#callers-table th:nth-child(3), #callers-table td:nth-child(3) { /* Hit Count */
-    width: 20%;
-    text-align: center;
+#callers-table th:nth-child(3), #callers-table td:nth-child(3) { /* File */
+    width: 55%;
 }
 
 #callers-table th {
@@ -621,3 +628,14 @@ body.dark-theme .drag-drop.dragover {
         max-width: 90%;
     }
 }
+/* Disable number input arrows */
+#pct-threshold::-webkit-inner-spin-button,
+#pct-threshold::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+#pct-threshold {
+    -moz-appearance: textfield; /* Firefox */
+}
+
+.pct-threshold-input { box-sizing: border-box; }

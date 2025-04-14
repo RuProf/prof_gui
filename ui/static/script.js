@@ -123,7 +123,7 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
                     }
                 }
                 // Calculate time per hit (time / count in seconds)
-                let time_per_hit = "-";
+                let time_per_hit = "";
                 if (info.time && info.count && info.count > 0) {
                     time_per_hit = (info.time / info.count / 1e9).toFixed(6) + " s";
                 }
@@ -137,11 +137,11 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
             .append("tr");
 
         rows.append("td").text(d => d.line);
-        rows.append("td").text(d => d.count || "-");
-        rows.append("td").text(d => d.time ? (d.time / 1e9).toFixed(6) + " s" : "-");
+        rows.append("td").text(d => d.count || "");
+        rows.append("td").text(d => d.time ? (d.time / 1e9).toFixed(6) + " s" : "");
         rows.append("td").text(d => d.time_per_hit);
         rows.append("td")
-            .text(d => d.pct_time !== "" ? d.pct_time + "%" : "-")
+            .text(d => d.pct_time !== "" ? d.pct_time + "%" : "")
             .classed("highlight-red", d => d.pct_time && parseFloat(d.pct_time) > pctThreshold);
         rows.append("td")
             .attr("class", "code")
@@ -205,9 +205,9 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
                                 callersModal.style("display", "none");
                             });
 
-                        rows.append("td").text(d => d.file.replace('./', ''));
-                        rows.append("td").text(d => `${d.func}()`);
                         rows.append("td").text(d => d.hits);
+                        rows.append("td").text(d => `${d.func}()`);
+                        rows.append("td").text(d => d.file.replace('./', ''));
 
                         callersModal.style("display", "block");
                     }
@@ -290,20 +290,20 @@ function loadJSONData(data) {
     updateUI(profilingData, selectedFile, selectedFunc);
 }
 
-// Check if /profile.json exists on the server
-fetch("/profile.json", { method: "GET" })
+// Check if /lprof_ext.json exists on the server
+fetch("/lprof_ext.json", { method: "GET" })
     .then(response => {
         if (response.ok) {
             return response.json();
         } else {
-            throw new Error("profile.json not found");
+            throw new Error("lprof_ext.json not found");
         }
     })
     .then(data => {
         loadJSONData(data);
     })
     .catch(error => {
-        console.log("Error fetching /profile.json:", error.message);
+        console.log("Error fetching /lprof_ext.json:", error.message);
         showDragDropZone();
 
         // Drag-and-drop logic
