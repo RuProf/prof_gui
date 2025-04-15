@@ -116,7 +116,7 @@ body.dark-theme #go-back-btn {
 }
 
 #tree-list {
-    max-height: calc(100% - 40px);
+    max-height: calc(100% - 80px); /* Adjusted to account for buttons */
     overflow-y: auto;
     border: 1px solid #ccc;
     padding: 5px;
@@ -126,6 +126,43 @@ body.dark-theme #go-back-btn {
 body.dark-theme #tree-list {
     background-color: #3a3a3a; /* Darker gray for tree list */
     border-color: #555;
+}
+
+/* Tree control buttons */
+.tree-controls {
+    margin-bottom: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+#collapse-tree-btn,
+#expand-tree-btn {
+    display: flex;
+    height: 2em;
+    align-items: center;
+    justify-content: center;
+    background-color: #eeeeee4b;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    transition: all 0.2s linear;
+    cursor: pointer;
+    border: none;
+    background: #fff;
+    padding: 5px 10px;
+    font-size: 14px;
+    text-align: center; 
+}
+
+#collapse-tree-btn:hover,
+#expand-tree-btn:hover {
+    box-shadow: 9px 9px 33px #d1d1d1, -9px -9px 33px #ffffff;
+    transform: translateY(-2px);
+}
+
+body.dark-theme #collapse-tree-btn,
+body.dark-theme #expand-tree-btn {
+    background: #3a3a3a;
+    color: #e0e0e0;
 }
 
 .directory {

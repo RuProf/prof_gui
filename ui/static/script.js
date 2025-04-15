@@ -69,7 +69,7 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
             .text(folderName);
         folderLi.on("click", function(event) {
             event.stopPropagation();
-            d3.select(this).classed("expanded", !d3.select(this).classed("expanded"));
+            d3.select(this).classORMALd("expanded", !d3.select(this).classed("expanded"));
         });
 
         const funcUl = rootChildren.append("ul");
@@ -433,6 +433,18 @@ const closeCallersBtn = d3.select("#close-callers-modal");
 
 closeCallersBtn.on("click", () => {
     callersModal.style("display", "none");
+});
+
+// Tree control buttons
+const collapseTreeBtn = d3.select("#collapse-tree-btn");
+const expandTreeBtn = d3.select("#expand-tree-btn");
+
+collapseTreeBtn.on("click", () => {
+    d3.selectAll("#tree-list .collapsible").classed("expanded", false);
+});
+
+expandTreeBtn.on("click", () => {
+    d3.selectAll("#tree-list .collapsible").classed("expanded", true);
 });
 
 // Drag-and-drop logic

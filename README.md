@@ -82,14 +82,22 @@ chore
 - [x] backbutton for last page
 - [x] trace last page record in list
 - [x] modal table view for hierarchy called
+- [x] [x] add a button for "collapse" and "expand" button for tree panel
 - [] is profile list needed?
     - [] menu button / siderbar for profile list
     - [] check json folder
     - [] default json choose by latest modidified time
     - []
 
-
 lprof
 - [] inline callable , like print_stats()
 - [] mapping dict for `import as` redirect 
 - [] trace the 3third party library , by specifying the list
+
+
+### Limitation:
+
+
+clickable event is not working in some cases
+- duplicated func name under the project direct (`a.py::func1` & `b.py::func1`)
+- can't redirect to the func that renamed - `import * as *`
