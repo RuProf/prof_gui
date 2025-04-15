@@ -1,2 +1,4 @@
 rust/
 python/
+ui/app.py
+ui/lprof_ext.json

@@ -82,7 +82,7 @@ chore
 - [x] backbutton for last page
 - [x] trace last page record in list
 - [x] modal table view for hierarchy called
-- [x] [x] add a button for "collapse" and "expand" button for tree panel
+- [x] add a button for "collapse" and "expand" button for tree panel
 - [] is profile list needed?
     - [] menu button / siderbar for profile list
     - [] check json folder

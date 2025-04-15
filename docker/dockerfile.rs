@@ -21,8 +21,8 @@ CMD ["/server"]
 # docker build -t prof_gui:rust -f docker/dockerfile.rs .
 
 # Dev
-# docker run --rm -d -v $PWD:/ -w /w -p 5000:8080 rust:1.85.1-slim
-# docker run --rm -d -p 5000:8080 prof_gui:rust
+# docker run --name prof_gui --rm -d -v $PWD:/ -w /w -p 5000:8080 rust:1.85.1-slim
+# docker run --name prof_gui --rm -d -p 5000:8080 --entrypoint sh prof_gui:rust
 
 # Deploy
 # docker run --rm -d --name prof_gui -v ./lprof_ext.json:/lprof_ext.json -p 5000:8080 prof_gui:rust

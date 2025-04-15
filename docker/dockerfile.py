@@ -9,8 +9,8 @@ CMD ["python", "app.py"]
 # docker build -t prof_gui:python -f docker/dockerfile.py .
 
 # Dev
-# docker run --rm -it -p 5000:8080 prof_gui:python
-# docker run --rm -it -v $PWD:/app -w /app -p 5000:8080 prof_gui:python bash
+# docker run --name prof_gui --rm -it -p 5000:8080 prof_gui:python
+# docker run --name prof_gui --rm -it -v $PWD:/app -w /app -p 5000:8080 prof_gui:python bash
 
 # Deploy
 # docker run --rm -d --name prof_gui -v ./lprof_ext.json:/lprof_ext.json -p 5000:8080 prof_gui:python
