@@ -61,7 +61,20 @@ go into func block like VScode
 - web base, multi tab 可以多個json compare 
 - Visualize profiling data
 
-### Next
+## Release
+
+V0.1.3
+> Feature
+- [] netron style
+- [] mouse -> previous page button = go to lastFile + lastFunc
+> chore
+- [] is profile list needed?
+    - [] menu button / siderbar for profile list
+    - [] check json folder
+    - [] default json choose by latest modidified time
+    
+V0.1.2
+> Feature
 - [x] highlight the row into red if pct of time > 30%
 - [x] gear button for setting
 - check if `/proile.json` exists
@@ -69,11 +82,9 @@ go into func block like VScode
     - [x] not exists > serverless, drag & drop > save as /lprof_ext.json
 - [x] Entrypoint
 - [x] gray theme (dark mode)
-- [] netron style
-- [] mouse -> previous page button = go to lastFile + lastFunc
 
-chore
-- [x] remove line details , 換做func name
+> chore
+- [x] remove line details , 換做func name 
 - [x] highlight the cell of pct time instead of row
 - [x] highlight the code cell in grey if clickable
 - [x] remove col2 clickable
@@ -83,11 +94,7 @@ chore
 - [x] trace last page record in list
 - [x] modal table view for hierarchy called
 - [x] add a button for "collapse" and "expand" button for tree panel
-- [] is profile list needed?
-    - [] menu button / siderbar for profile list
-    - [] check json folder
-    - [] default json choose by latest modidified time
-    - []
+
 
 ### Limitation:
 
