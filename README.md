@@ -89,15 +89,8 @@ chore
     - [] default json choose by latest modidified time
     - []
 
-lprof
-- [] inline callable , like print_stats()
-- [] mapping dict for `import as` redirect 
-- [] trace the 3third party library , by specifying the list
-
-
 ### Limitation:
 
-
-clickable event is not working in some cases
+clickable event is not working in following cases:
 - duplicated func name under the project direct (`a.py::func1` & `b.py::func1`)
 - can't redirect to the func that renamed - `import * as *`
