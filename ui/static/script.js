@@ -69,7 +69,7 @@ function updateUI(data, file = selectedFile, func = selectedFunc) {
             .text(folderName);
         folderLi.on("click", function(event) {
             event.stopPropagation();
-            d3.select(this).classORMALd("expanded", !d3.select(this).classed("expanded"));
+            d3.select(this).classed("expanded", !d3.select(this).classed("expanded"));
         });
 
         const funcUl = rootChildren.append("ul");
@@ -435,16 +435,14 @@ closeCallersBtn.on("click", () => {
     callersModal.style("display", "none");
 });
 
-// Tree control buttons
-const collapseTreeBtn = d3.select("#collapse-tree-btn");
-const expandTreeBtn = d3.select("#expand-tree-btn");
+// Tree control button
+const toggleTreeBtn = d3.select("#toggle-tree-btn");
 
-collapseTreeBtn.on("click", () => {
-    d3.selectAll("#tree-list .collapsible").classed("expanded", false);
-});
-
-expandTreeBtn.on("click", () => {
-    d3.selectAll("#tree-list .collapsible").classed("expanded", true);
+toggleTreeBtn.on("click", () => {
+    const collapsibles = d3.selectAll("#tree-list .collapsible");
+    const isAllExpanded = collapsibles.nodes().every(node => d3.select(node).classed("expanded"));
+    collapsibles.classed("expanded", !isAllExpanded);
+    toggleTreeBtn.text(isAllExpanded ? "+ Expand Tree +" : "- Collapse -");
 });
 
 // Drag-and-drop logic

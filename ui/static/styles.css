@@ -135,8 +135,7 @@ body.dark-theme #tree-list {
     gap: 10px;
 }
 
-#collapse-tree-btn,
-#expand-tree-btn {
+#toggle-tree-btn {
     display: flex;
     height: 2em;
     align-items: center;
@@ -150,17 +149,16 @@ body.dark-theme #tree-list {
     background: #fff;
     padding: 5px 10px;
     font-size: 14px;
-    text-align: center; 
+    text-align: center;
+    width: 100%; /* Ensure button spans the container */
 }
 
-#collapse-tree-btn:hover,
-#expand-tree-btn:hover {
+#toggle-tree-btn:hover {
     box-shadow: 9px 9px 33px #d1d1d1, -9px -9px 33px #ffffff;
     transform: translateY(-2px);
 }
 
-body.dark-theme #collapse-tree-btn,
-body.dark-theme #expand-tree-btn {
+body.dark-theme #toggle-tree-btn {
     background: #3a3a3a;
     color: #e0e0e0;
 }
